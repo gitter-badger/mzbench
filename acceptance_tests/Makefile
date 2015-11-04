@@ -1,6 +1,6 @@
 
 .PHONY: check
-check: local-tests basic-tests migrations-tests
+check: local-tests basic-tests migrations-tests default-conf
 
 .PHONY: local-tests
 local-tests:
@@ -17,6 +17,10 @@ migrations-tests:
 .PHONY: quick-test
 quick-test:
 	./mzb_quick_test.py -v
+
+.PHONY: default-conf
+default-conf:
+	./check_default_conf.erl
 
 .PHONY: clean
 clean:
