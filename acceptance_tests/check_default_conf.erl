@@ -14,7 +14,8 @@ compare(List1, List2) ->
                                     [Y, proplists:get_value(X, List1), X]),
                                     error end end, List2)).
 check_configs({App, List}) ->
-    XList = [server_configs],
+    XList = [server_configs, included_applications, node_management_port, mail,
+             node_log_port, bench_log_port, bench_metrics_port],
     Original = application:get_all_env(App),
     Original2 = lists:foldl(fun proplists:delete/2, Original, XList),
     case {compare(List, Original2),compare(Original2, List)} of
