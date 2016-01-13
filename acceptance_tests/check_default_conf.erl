@@ -16,7 +16,7 @@ compare(List1, List2) ->
 check_configs({App, List}) ->
     XList = [server_configs],
     Original = application:get_all_env(App),
-    Original2 = lists:fold(fun proplists:delete/2, Original, XList),
+    Original2 = lists:foldl(fun proplists:delete/2, Original, XList),
     case {compare(List, Original2),compare(Original2, List)} of
         {true, true} -> ok;
         _ -> erlang:error(default_config_mismatch)
