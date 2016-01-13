@@ -6,13 +6,21 @@ add_libs() ->
     CodePaths = filelib:wildcard(filename:join(BinDir, "../server/_build/default/deps/*/ebin/")),
     code:add_pathsz(CodePaths).
 
-check_configs({App, List}) ->
-    Original = application:get_all_env(App),
-    lists:map(fun({X, Y}) -> case Y == proplists:get_value(X, Original) of
+compare(List1, List2) ->
+    lists:all(fun(X) -> X == ok end,
+        lists:map(fun({X, Y}) -> case Y == proplists:get_value(X, List1) of
                                 true -> ok;
                                 _ -> io:format("~p should be equal to ~p for ~p", 
-                                    [Y, proplists:get_value(X, Original), X]),
-                                    erlang:error(default_config_mismatch) end end, List).
+                                    [Y, proplists:get_value(X, List1), X]),
+                                    error end end, List2)).
+check_configs({App, List}) ->
+    XList = [server_configs],
+    Original = application:get_all_env(App),
+    Original2 = lists:fold(fun proplists:delete/2, Original, XList),
+    case {compare(List, Original2),compare(Original2, List)} of
+        {true, true} -> ok;
+        _ -> erlang:error(default_config_mismatch)
+    end.
 
 main(_) ->
     add_libs(),
