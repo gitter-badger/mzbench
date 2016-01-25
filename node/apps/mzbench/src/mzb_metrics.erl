@@ -90,7 +90,7 @@ init([Env, MetricGroups, Nodes]) ->
         }}.
 
 handle_call(final_trigger, _From, State) ->
-    timer:sleep(3000),  % Let exometer the time to finish reporting
+    timer:sleep(?INTERVAL),  % Let exometer the time to finish reporting
     NewState = tick(State#s{active = false, stop_time = os:timestamp()}),
     exometer_report:trigger_interval(mzb_exometer_report_apiserver, ?INTERVALNAME),
 
@@ -108,7 +108,6 @@ handle_cast(Msg, State) ->
     {stop, {unhandled_cast, Msg}, State}.
 
 handle_info(trigger, State = #s{active = false}) ->
-    erlang:send_after(?INTERVAL, self(), trigger),
     {noreply, State};
 handle_info(trigger, State = #s{active = true}) ->
     NewState = tick(State),
