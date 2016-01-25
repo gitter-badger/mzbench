@@ -61,7 +61,8 @@ get_value(Metric) ->
     end.
 
 final_trigger() ->
-    gen_server:call(?MODULE, final_trigger, infinity).
+    gen_server:call(?MODULE, final_trigger, infinity),
+    timer:sleep(3000).  % Let exometer the time to finish reporting
 
 -spec get_failed_asserts() -> [term()].
 get_failed_asserts() ->
@@ -92,8 +93,6 @@ init([Env, MetricGroups, Nodes]) ->
 handle_call(final_trigger, _From, State) ->
     NewState = tick(State#s{active = false, stop_time = os:timestamp()}),
     exometer_report:trigger_interval(mzb_exometer_report_apiserver, ?INTERVALNAME),
-    timer:sleep(3000),  % Let exometer the time to finish reporting
-
     {reply, ok, NewState};
 
 handle_call(get_failed_asserts, _From, #s{asserts = Asserts} = State) ->
