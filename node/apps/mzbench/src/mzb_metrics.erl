@@ -90,8 +90,9 @@ init([Env, MetricGroups, Nodes]) ->
         metrics = extract_metrics(MetricGroups)
         }}.
 
-handle_call(final_trigger, _From, State) ->
-    NewState = tick(State#s{active = false, stop_time = os:timestamp()}),
+handle_call(final_trigger, _From, State#s{last_tick_time = Last}) ->
+    NewState = if Last =/= os:timestamp() -> tick(State#s{active = false, stop_time = os:timestamp()});
+                true -> State end,
     exometer_report:trigger_interval(mzb_exometer_report_apiserver, ?INTERVALNAME),
     {reply, ok, NewState};
 
